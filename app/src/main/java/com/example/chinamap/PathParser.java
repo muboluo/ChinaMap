@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.dongnao.chinamap;
+package com.example.chinamap;
 
 import android.graphics.Path;
 import android.util.Log;

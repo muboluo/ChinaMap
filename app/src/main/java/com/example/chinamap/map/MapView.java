@@ -16,7 +16,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.dongnao.chinamap.PathParser;
+import com.example.chinamap.PathParser;
 import com.example.chinamap.ProvinceItem;
 import com.example.chinamap.R;
 
