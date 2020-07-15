@@ -5,18 +5,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.icu.util.Measure;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.viewpager.widget.PagerTabStrip;
 
 import com.dongnao.chinamap.PathParser;
 import com.example.chinamap.ProvinceItem;
@@ -125,6 +123,9 @@ public class MapView extends View {
                     String pathData = element.getAttribute("android:pathData");
                     final Path path = PathParser.createPathFromPathData(pathData);
                     ProvinceItem item = new ProvinceItem(path);
+                    int color = getProvinceDrawColor(i);
+                    item.setDrawColor(color);
+
                     provinceList.add(item);
 
                     RectF rect = new RectF();
@@ -136,24 +137,6 @@ public class MapView extends View {
                     right = right == -1 ? rect.right : Math.max(right, rect.right);
                     bottom = bottom == -1 ? rect.bottom : Math.max(bottom, rect.bottom);
 
-                    int color = Color.WHITE;
-                    int flag = i % 4;
-                    switch (flag) {
-                        case 1:
-                            color = colorArray[0];
-                            break;
-                        case 2:
-                            color = colorArray[1];
-                            break;
-                        case 3:
-                            color = colorArray[2];
-                            break;
-                        default:
-                            color = Color.CYAN;
-                            break;
-
-                    }
-                    provinceList.get(i).setDrawColor(color);
                 }
                 totalRect = new RectF(left, top, right, bottom);
                 handler.sendEmptyMessage(1);
@@ -163,6 +146,27 @@ public class MapView extends View {
             }
         }
     };
+
+    private int getProvinceDrawColor(int i) {
+        int color = Color.WHITE;
+        int flag = i % 4;
+        switch (flag) {
+            case 1:
+                color = colorArray[0];
+                break;
+            case 2:
+                color = colorArray[1];
+                break;
+            case 3:
+                color = colorArray[2];
+                break;
+            default:
+                color = Color.CYAN;
+                break;
+
+        }
+        return color;
+    }
 
     private Handler handler = new Handler() {
 
@@ -179,4 +183,30 @@ public class MapView extends View {
         }
     };
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        handleTouch(event);
+        Log.e(TAG, "handle event" + event.getAction());
+        return super.onTouchEvent(event);
+    }
+
+    private void handleTouch(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            Log.e(TAG, "handle event" + event.getAction());
+
+            for (ProvinceItem item :
+                    provinceList) {
+                if (item.isTouch(event.getX() / scale, event.getY() / scale)) {
+                    selectItem = item;
+                    break;
+                }
+            }
+            if (selectItem != null) {
+                postInvalidate();
+            }
+        }
+    }
+
 }
+
